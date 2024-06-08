@@ -1,24 +1,36 @@
-const { Schema, model } = require("mongoose");
+const { DataTypes } = require("sequelize");
+const sequelize = require("../database/index.js");
+const Pet = require("./pet.js");
 
-const UserSchema = Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    number: {
-      type: Number,
-      required: true,
-    },
+const User = sequelize.define("User", {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
   },
-  {
-    timestamps: true,
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
-);
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
 
-module.exports = model("User", UserSchema, "users");
+User.hasMany(Pet, {
+  foreignKey: "userId",
+  sourceKey: "id",
+});
+
+Pet.belongsTo(User, {
+  foreignKey: "userId",
+  targetId: "id",
+});
+
+module.exports = User;

@@ -1,14 +1,7 @@
 const tf = require("@tensorflow/tfjs-node");
 const fs = require("node:fs");
-
-// Load the graph model
-const modelPath = "/home/michael/Projects/model API/model/model.json";
-const model = fs.readFileSync(modelPath, "utf8");
-
-// Define a route to serve the model
-exports.getModel = (req, res) => {
-  res.json(model);
-};
+const Pet = require("../models/pet");
+const { labels } = require("../constants/breeds.js");
 
 // Define a route to receive ImageData and make a prediction
 const predict = async (imagePath) => {
@@ -30,7 +23,7 @@ const predict = async (imagePath) => {
     const classIdx = results.as1D().argMax().dataSync()[0];
 
     // Send the prediction as response
-    return classIdx;
+    return { classIdx, predictions };
   } catch (error) {
     console.log(error.message);
     return "error making prediction";
@@ -50,11 +43,13 @@ function preprocessImageData(imageData) {
 }
 
 exports.upload = async (req, res) => {
+  const user = req.user;
+
   try {
     if (!req.file) {
       return res
         .status(404)
-        .send({ status: "error", message: "could not get the file" });
+        .send({ error: true, message: "could not get the file" });
     }
 
     //get file name
@@ -64,16 +59,25 @@ exports.upload = async (req, res) => {
     const imageSplit = image.split(".");
     const extension = imageSplit[imageSplit.length - 1];
 
-    const prediction = await predict(req.file.path);
+    const { classIdx, predictions } = await predict(req.file.path);
+
+    const pet = Pet.create({
+      userId: user.id,
+      image: req.file.path,
+      breed: labels[classIdx].breed,
+      name: labels[classIdx].breed,
+      description: labels[classIdx].description,
+    });
 
     //return an answer
     return res.status(200).send({
-      status: "success",
+      error: false,
       message: "file uploaded successfully",
-      file: req.file,
-      prediction: prediction || "failed prediction",
+      prediction: classIdx || "failed prediction",
+      predictions: predictions || "failed prediction",
+      pet,
     });
   } catch (error) {
-    res.status(500).send({ status: "error", message: error.message });
+    res.status(500).send({ error: true, message: error.message });
   }
 };

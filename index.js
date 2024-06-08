@@ -1,10 +1,14 @@
 const express = require("express");
-const { modelRouter, uploads } = require("./routes/model.js");
-const multer = require("multer");
 const cors = require("cors");
-const connection = require("./database/index.js");
-require("./models/user.js");
+require("express-async-errors");
+const sequelize = require("./database/index.js");
+const { errorHandler } = require("./middlewares/errorHandler.js");
 require("./models/pet.js");
+require("./models/user.js");
+
+const modelRouter = require("./routes/model.js");
+const userRouter = require("./routes/user.js");
+const petRouter = require("./routes/pet.js");
 
 const app = express();
 const port = 3000;
@@ -21,12 +25,20 @@ app.use(express.urlencoded({ extended: true }));
 
 // Use the model router
 app.use("/model", modelRouter);
-app.use("/", (req, res) => {
-  res.send("Welcome to the model API");
-});
+app.use("/user", userRouter);
+app.use("/pet", petRouter);
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-  connection();
-});
+//Error middleware
+app.use(errorHandler);
+
+// Initializes the server
+const main = async () => {
+  try {
+    await sequelize.sync({ force: true });
+    app.listen(port, () => console.log(`App listening on port ${port}`));
+  } catch (error) {
+    console.log("could not start server", error);
+  }
+};
+
+main();

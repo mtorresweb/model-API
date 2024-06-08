@@ -1,7 +1,8 @@
 const express = require("express");
-const modelRouter = express.Router();
+const router = express.Router();
 const multer = require("multer");
 const { upload } = require("../controllers/model.js");
+const { auth } = require("../middlewares/auth.js");
 
 // multer configuration
 const storage = multer.diskStorage({
@@ -15,6 +16,6 @@ const storage = multer.diskStorage({
 
 const uploads = multer({ storage });
 
-modelRouter.post("/upload", [uploads.single("image")], upload);
+router.post("/upload", [auth, uploads.single("image")], upload);
 
-module.exports = { modelRouter, uploads };
+module.exports = router;

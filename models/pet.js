@@ -1,22 +1,24 @@
-const { Schema, model } = require("mongoose");
+const { DataTypes } = require("sequelize");
+const sequelize = require("../database/index.js");
 
-const PetSchema = Schema(
-  {
-    breed: {
-      type: String,
-      required: true,
-    },
-    name: {
-      type: String,
-    },
-    owner: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
+const Pet = sequelize.define("Pet", {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
   },
-  {
-    timestamps: true,
+  name: {
+    type: DataTypes.STRING,
   },
-);
+  description: DataTypes.STRING,
+  breed: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  image: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
 
-module.exports = model("Pet", PetSchema, "pets");
+module.exports = Pet;
