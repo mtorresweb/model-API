@@ -34,7 +34,7 @@ app.use(errorHandler);
 // Initializes the server
 const main = async () => {
   try {
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ force: false });
     app.listen(port, () => console.log(`App listening on port ${port}`));
   } catch (error) {
     console.log("could not start server", error);

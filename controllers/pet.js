@@ -36,7 +36,9 @@ const listPets = async (req, res) => {
   const pets = await Pet.findAll({ where: { userId: user.id } });
 
   if (!pets.length)
-    return res.status(404).send({ error: true, message: "No pets found" });
+    return res
+      .status(200)
+      .send({ error: false, message: "No pets found", pets: [] });
 
   return res
     .status(200)

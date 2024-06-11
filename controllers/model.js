@@ -63,7 +63,7 @@ exports.upload = async (req, res) => {
 
     const pet = Pet.create({
       userId: user.id,
-      image: req.file.path,
+      image: req.file.path.replace("uploads/pets/", ""),
       breed: labels[classIdx].breed,
       name: labels[classIdx].breed,
       description: labels[classIdx].description,
@@ -73,9 +73,9 @@ exports.upload = async (req, res) => {
     return res.status(200).send({
       error: false,
       message: "file uploaded successfully",
+      breed: labels[classIdx].breed,
       prediction: classIdx || "failed prediction",
       predictions: predictions || "failed prediction",
-      pet,
     });
   } catch (error) {
     res.status(500).send({ error: true, message: error.message });

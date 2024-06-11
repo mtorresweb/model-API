@@ -8,15 +8,15 @@ const Pet = sequelize.define("Pet", {
     autoIncrement: true,
   },
   name: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
   },
-  description: DataTypes.STRING,
+  description: DataTypes.TEXT,
   breed: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false,
   },
   image: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false,
   },
 });
